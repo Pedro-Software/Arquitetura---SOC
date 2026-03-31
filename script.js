@@ -139,6 +139,11 @@ let rotX = 0.12;
 let lastHandPos = { x: 0, y: 0 };
 let cameraController = null;
 let bootTimeout = null;
+// Novas variáveis para controle manual (Mouse/Touch)
+let isPointerDown = false;
+let pointerX = 0;
+let pointerY = 0;
+const pointerSensitivity = 0.005;
 
 const ROTATION_SPEED = 0.003;
 const raycaster = new THREE.Raycaster();
@@ -860,7 +865,7 @@ function createDatabaseNode() {
   linkBridge.position.set(0, 0.3, 0.65);
   group.add(linkBridge);
 
-  const label = createLabelSprite('MISP THREAT INTEL CLUSTER', '#d6a6ff', 760, 120);
+  const label = createLabelSprite('MISP THREAT INTEL', '#d6a6ff', 760, 120);
   label.scale.set(6.0, 0.95, 1);
   label.position.set(0, 3.55, 0);
   group.add(label);
@@ -1035,7 +1040,7 @@ function buildArchitecture() {
     siem.position.clone().add(new THREE.Vector3(1.75, 0.5, 0)),
     misp.position.clone().add(new THREE.Vector3(-1.5, 0.4, 0)),
     palette.violet,
-    'ENRIQUECIMENTO IOC',
+    'REQUISIÇÃO IOC',
     3.4,
     0.14
   );
@@ -1140,10 +1145,8 @@ function getNodeNearCrosshair() {
 }
 
 function updateSelection() {
-  if (!isScanning) {
-    if (selectedNode) updateInfoPanel(null);
-    return;
-  }
+  // Se não houver mão escaneando, não faz nada (mantém a seleção do clique)
+  if (!isScanning) return; 
 
   raycaster.setFromCamera(screenCenter, camera);
   const intersects = raycaster.intersectObjects(nodes.map((node) => node.hitArea), false);
@@ -1515,5 +1518,53 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   setupSkeletonCanvas();
 });
+// ==========================
+// CONTROLE MANUAL (MOUSE / TOUCH)
+// ==========================
+window.addEventListener('pointerdown', (event) => {
+    // Evita selecionar se clicar em botões do chat ou UI
+    if (event.target.closest('#ui-layer') || event.target.closest('#chat-container')) return;
+    
+    isPointerDown = true;
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+
+    // Lógica de Seleção por Clique/Toque
+    const mouse = new THREE.Vector2();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(nodes.map(n => n.hitArea), false);
+
+    if (intersects.length > 0) {
+        updateInfoPanel(intersects[0].object.userData.nodeMeta);
+    } else {
+        // Se clicar no vazio, desmarca (opcional)
+        // updateInfoPanel(null);
+    }
+});
+
+window.addEventListener('pointermove', (event) => {
+    if (!isPointerDown || isGrabbing) return; // Se a mão estiver "agarrando", o gesto tem prioridade
+
+    const deltaX = event.clientX - pointerX;
+    const deltaY = event.clientY - pointerY;
+
+    rotY += deltaX * pointerSensitivity;
+    rotX += deltaY * pointerSensitivity;
+
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+});
+
+window.addEventListener('pointerup', () => {
+    isPointerDown = false;
+});
+
+// Suporte para Zoom com o Scroll do Mouse
+window.addEventListener('wheel', (event) => {
+    targetScale = Math.max(0.72, Math.min(2.2, targetScale - event.deltaY * 0.001));
+}, { passive: true });
 
 initApp();
