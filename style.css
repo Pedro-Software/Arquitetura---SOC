@@ -1,3 +1,6 @@
+/* ============================================================
+   VARIÁVEIS GLOBAIS (Design Tokens)
+   ============================================================ */
 :root {
   --cyan: #00f2fe;
   --cyan-soft: rgba(0, 242, 254, 0.18);
@@ -5,10 +8,12 @@
   --red: #ff4b6e;
   --lime: #9eff6e;
   --violet: #a855f7;
-  --panel: rgba(4, 12, 28, 0.82);
+  --panel: rgba(4, 12, 28, 0.88);
+  --bottom-sheet-h: 220px; /* altura do bottom sheet mobile */
 }
 
 * { box-sizing: border-box; }
+
 html, body {
   margin: 0;
   width: 100%;
@@ -34,35 +39,22 @@ body::before {
   opacity: 0.18;
 }
 
-#input_video {
+/* ============================================================
+   CANVAS 3D
+   ============================================================ */
+#output_canvas {
   position: absolute;
   inset: 0;
   width: 100vw;
   height: 100vh;
-  object-fit: cover;
-  transform: scaleX(-1);
-  z-index: 0;
-  opacity: 0.12;
-  filter: grayscale(1) contrast(1.1) brightness(0.65);
-}
-
-#output_canvas,
-#skeleton_canvas {
-  position: absolute;
-  inset: 0;
-}
-
-#output_canvas {
   z-index: 1;
-  pointer-events: none;
+  touch-action: none;
+  pointer-events: auto;
 }
 
-#skeleton_canvas {
-  z-index: 2;
-  pointer-events: none;
-  transform: scaleX(-1);
-}
-
+/* ============================================================
+   UI LAYER (overlay)
+   ============================================================ */
 #ui-layer {
   position: absolute;
   inset: 0;
@@ -104,44 +96,83 @@ body::before {
   text-align: right;
 }
 
+/* ============================================================
+   BOTÃO DE AJUDA (colapsável no mobile)
+   ============================================================ */
+#help-toggle {
+  display: none; /* oculto no desktop — visível via media query */
+  position: absolute;
+  top: 62px;
+  left: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 242, 254, 0.4);
+  background: var(--panel);
+  color: var(--cyan);
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#help-toggle:active {
+  transform: scale(0.9);
+}
+
+#help-toggle.active {
+  box-shadow: 0 0 16px rgba(0, 242, 254, 0.5);
+}
+
+/* ============================================================
+   PAINEL DE CONTROLES
+   ============================================================ */
 #controls-summary {
   position: absolute;
   top: 88px;
   left: 20px;
-  width: 230px;
+  width: 210px;
   background: var(--panel);
   border: 1px solid rgba(0, 242, 254, 0.24);
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 14px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
   backdrop-filter: blur(10px);
   box-shadow: 0 0 30px rgba(0, 242, 254, 0.08);
+  pointer-events: auto;
 }
 
 .control-header {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--cyan);
   border-bottom: 1px solid rgba(255,255,255,0.08);
-  padding-bottom: 6px;
+  padding-bottom: 5px;
   letter-spacing: 1px;
 }
 
 .control-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 12px;
+  gap: 8px;
+  font-size: 11px;
   color: #d3e4f1;
 }
 
 .control-icon {
-  width: 28px;
-  font-size: 20px;
+  width: 22px;
+  font-size: 15px;
   text-align: center;
+  flex-shrink: 0;
 }
 
+/* ============================================================
+   CHAT
+   ============================================================ */
 #chat-container {
   position: absolute;
   left: 20px;
@@ -278,13 +309,16 @@ body::before {
   cursor: pointer;
 }
 
+/* ============================================================
+   INFO PANEL — Desktop (lateral direita)
+   ============================================================ */
 #info-panel {
   position: absolute;
   right: 30px;
   top: 50%;
   transform: translateY(-50%);
-  width: min(360px, calc(100vw - 40px));
-  background: rgba(4, 10, 20, 0.88);
+  width: min(340px, calc(100vw - 60px));
+  background: var(--panel);
   border-right: 4px solid var(--cyan);
   border-top: 1px solid rgba(0, 242, 254, 0.25);
   border-bottom: 1px solid rgba(0, 242, 254, 0.25);
@@ -293,7 +327,9 @@ body::before {
   padding: 24px;
   text-align: right;
   display: none;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px);
+  pointer-events: auto;
+  transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 #info-panel.active {
@@ -306,8 +342,13 @@ body::before {
   to { opacity: 1; transform: translate(0, -50%); }
 }
 
+/* Handle do bottom sheet — escondido no desktop */
+.info-panel-handle {
+  display: none;
+}
+
 .info-title {
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 800;
   color: var(--cyan);
   text-transform: uppercase;
@@ -315,54 +356,57 @@ body::before {
 }
 
 .info-coord {
-  margin: 6px 0 14px;
-  padding-bottom: 8px;
+  margin: 4px 0 10px;
+  padding-bottom: 6px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
   font-family: "Courier New", monospace;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--blue);
   letter-spacing: 1px;
 }
 
 .info-desc {
-  max-height: 220px;
+  max-height: 160px;
   overflow-y: auto;
-  padding-left: 14px;
-  margin-left: 12px;
+  padding-left: 12px;
+  margin-left: 10px;
   border-left: 2px solid rgba(255,255,255,0.1);
-  font-size: 13px;
-  line-height: 1.65;
+  font-size: 12px;
+  line-height: 1.6;
   color: #e6eef9;
 }
 
 .info-stats {
-  margin-top: 18px;
+  margin: 10px 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 8px;
 }
 
 .info-stats div {
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 12px;
-  padding: 10px 12px;
+  border-radius: 10px;
+  padding: 8px 10px;
 }
 
 .info-stats span {
   display: block;
-  font-size: 10px;
+  font-size: 9px;
   opacity: 0.72;
   letter-spacing: 1px;
 }
 
 .info-stats strong {
   display: block;
-  margin-top: 4px;
+  margin-top: 3px;
   color: var(--cyan);
-  font-size: 13px;
+  font-size: 12px;
 }
 
+/* ============================================================
+   CROSSHAIR
+   ============================================================ */
 #crosshair {
   position: absolute;
   left: 50%;
@@ -404,6 +448,9 @@ body::before {
   transform: translate(-50%, -50%) scale(1.12);
 }
 
+/* ============================================================
+   LOADING
+   ============================================================ */
 #loading {
   position: absolute;
   inset: 0;
@@ -419,52 +466,154 @@ body::before {
 
 .status-neutral { color: #8a93a8; }
 
+/* ============================================================
+   MEDIA QUERIES — Tablets (max-width: 900px)
+   ============================================================ */
 @media (max-width: 900px) {
-  .logo { font-size: 18px; max-width: 60vw; }
-  #controls-summary { width: 200px; top: 84px; }
-  #info-panel {
-    top: auto;
-    bottom: 20px;
-    right: 20px;
-    transform: none;
-    border-radius: 16px;
-    width: min(360px, calc(100vw - 40px));
-  }
-
-  #info-panel.active {
-    animation: floatUp 0.3s ease;
-  }
-
-  @keyframes floatUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  .logo { font-size: 18px; max-width: 55vw; }
+  #controls-summary { width: 195px; }
 }
 
-@media (max-width: 680px) {
-  #controls-summary,
-  #status-feed {
-    display: none;
+/* ============================================================
+   MEDIA QUERIES — Mobile (max-width: 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+  .logo {
+    font-size: 15px;
+    max-width: 50vw;
+    top: 14px;
+    left: 14px;
   }
 
   .mode-indicator {
-    top: 16px;
-    right: 16px;
-    font-size: 11px;
+    top: 14px;
+    right: 14px;
+    font-size: 10px;
+    padding: 7px 10px;
   }
 
-  #chat-container {
-    left: 12px;
-    right: 12px;
-    width: auto;
-    bottom: 12px;
-    height: 240px;
+  #status-feed { display: none; }
+
+  /* Botão de ajuda visível */
+  #help-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+
+  /* Controls summary — oculto por padrão, expansível via botão */
+  #controls-summary {
+    top: 104px;
+    left: 14px;
+    width: 175px;
+    padding: 10px 12px;
+    gap: 7px;
+    display: none; /* controlado via JS toggle */
+    border-radius: 12px;
+    z-index: 5;
+  }
+
+  #controls-summary.visible {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .control-header { font-size: 9px; }
+  .control-item { font-size: 10px; gap: 6px; }
+  .control-icon { width: 18px; font-size: 13px; }
+
+  /* Crosshair menor no mobile */
+  #crosshair {
+    width: 48px;
+    height: 48px;
+  }
+  #crosshair::before { height: 60px; top: -6px; }
+  #crosshair::after { width: 60px; left: -6px; }
+
+  /* -------------------------------------------------------
+     INFO PANEL — Bottom Sheet
+     ------------------------------------------------------- */
+  #info-panel {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: var(--bottom-sheet-h);
+    transform: none;
+    border-radius: 20px 20px 0 0;
+    border-right: none;
+    border-top: 2px solid rgba(0, 242, 254, 0.35);
+    border-bottom: none;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.7);
+    padding: 10px 20px 18px;
+    text-align: left;
+    overflow-y: auto;
+    z-index: 10;
+  }
+
+  #info-panel.active {
+    display: block;
+    animation: sheetUp 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  @keyframes sheetUp {
+    from { opacity: 0; transform: translateY(100%); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Handle visual do bottom sheet */
+  .info-panel-handle {
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 2px;
+    margin: 0 auto 10px;
+  }
+
+  .info-title { font-size: 17px; }
+  .info-coord { font-size: 10px; margin: 2px 0 6px; }
+  .info-stats { gap: 6px; margin: 6px 0; }
+  .info-stats div { padding: 6px 8px; border-radius: 8px; }
+  .info-stats span { font-size: 8px; }
+  .info-stats strong { font-size: 11px; margin-top: 2px; }
+  .info-desc {
+    max-height: 80px;
+    font-size: 11px;
+    line-height: 1.5;
+    margin-left: 0;
+    padding-left: 10px;
+  }
+
+  /* Chat — ajustes mobile */
+  #chat-container {
+    left: 10px;
+    right: 10px;
+    width: auto;
+    bottom: 10px;
+    height: 220px;
+  }
+}
+
+/* ============================================================
+   MEDIA QUERIES — Mobile pequeno (max-width: 480px)
+   ============================================================ */
+@media (max-width: 480px) {
+  .logo { font-size: 13px; }
+  .mode-indicator { font-size: 9px; padding: 5px 8px; }
 
   #info-panel {
-    left: 12px;
-    right: 12px;
-    bottom: 260px;
-    width: auto;
+    --bottom-sheet-h: 200px;
+    padding: 8px 14px 14px;
   }
+
+  .info-title { font-size: 15px; }
+  .info-desc { max-height: 65px; }
 }
