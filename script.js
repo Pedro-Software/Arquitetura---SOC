@@ -627,9 +627,13 @@ function createFirewallNode() {
   pedestal.position.y = -0.72;
   group.add(pedestal);
 
+  // Label elevado acima da zona de passagem dos arcos de fluxo
+  // e com renderOrder alto para garantir que renderize na frente das linhas
   const label = createLabelSprite('SURICATA FIREWALL', '#004a99', 620, 120);
   label.scale.set(4.8, 0.95, 1);
-  label.position.set(0, 1.85, 0);
+  label.position.set(0, 2.6, 0);
+  label.renderOrder = 200;
+  label.material.depthTest = false;
   group.add(label);
 
   return group;
@@ -924,14 +928,15 @@ function buildArchitecture() {
   });
 
   // Fluxos — Amarelo Moura (alertas/hostil) e Azul Moura (dados normais)
+  // Endpoints rebaixados (y: -0.3) para que os arcos não cruzem o label "SURICATA FIREWALL"
   createFlow(
     kali.position.clone().add(new THREE.Vector3(1.2, 0.4, 0)),
-    suricata.position.clone().add(new THREE.Vector3(-1.3, 0.2, 0)),
+    suricata.position.clone().add(new THREE.Vector3(-1.3, -0.3, 0)),
     palette.accent, 'TRÁFEGO HOSTIL', 3.1, 0.16
   );
 
   createFlow(
-    suricata.position.clone().add(new THREE.Vector3(1.3, 0.2, 0)),
+    suricata.position.clone().add(new THREE.Vector3(1.3, -0.3, 0)),
     siem.position.clone().add(new THREE.Vector3(-1.8, 0.5, 0)),
     palette.primary, 'EVENTOS IDS/IPS', 3.8, 0.19
   );
