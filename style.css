@@ -1,15 +1,22 @@
 /* ============================================================
-   VARIÁVEIS GLOBAIS (Design Tokens)
+   VARIÁVEIS GLOBAIS — Paleta Moura (Engenharia Industrial Moderna)
    ============================================================ */
 :root {
-  --cyan: #00f2fe;
-  --cyan-soft: rgba(0, 242, 254, 0.18);
-  --blue: #4facfe;
-  --red: #ff4b6e;
-  --lime: #9eff6e;
-  --violet: #a855f7;
-  --panel: rgba(4, 12, 28, 0.88);
-  --bottom-sheet-h: 220px; /* altura do bottom sheet mobile */
+  --moura-blue: #004a99;
+  --moura-blue-light: #0066cc;
+  --moura-blue-dark: #003366;
+  --moura-yellow: #ffcc00;
+  --moura-yellow-soft: rgba(255, 204, 0, 0.15);
+  --moura-white: #ffffff;
+  --moura-text: #1a1a1a;
+  --moura-text-secondary: #4b5563;
+  --moura-gray-light: #f3f4f6;
+  --moura-gray-border: #d1d5db;
+  --panel-bg: rgba(255, 255, 255, 0.96);
+  --panel-border: var(--moura-blue);
+  --shadow-soft: 0 2px 16px rgba(0, 74, 153, 0.10);
+  --shadow-medium: 0 4px 24px rgba(0, 74, 153, 0.14);
+  --bottom-sheet-h: 220px;
 }
 
 * { box-sizing: border-box; }
@@ -19,24 +26,14 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(13, 38, 84, 0.25), transparent 42%),
-    radial-gradient(circle at 20% 15%, rgba(0, 242, 254, 0.08), transparent 24%),
-    linear-gradient(180deg, #02040b 0%, #010205 100%);
-  font-family: "Segoe UI", Roboto, sans-serif;
-  color: #fff;
+  background: var(--moura-white);
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  color: var(--moura-text);
 }
 
+/* Remover grid overlay neon */
 body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-  background-size: 60px 60px;
-  pointer-events: none;
-  opacity: 0.18;
+  display: none;
 }
 
 /* ============================================================
@@ -62,36 +59,57 @@ body::before {
   pointer-events: none;
 }
 
+/* ============================================================
+   LOGO HEADER — Moura
+   ============================================================ */
 .logo {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  font-size: 24px;
-  font-weight: 800;
-  letter-spacing: 2px;
-  background: linear-gradient(90deg, var(--cyan), var(--blue));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 30px rgba(0, 242, 254, 0.35);
+  top: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
 }
 
+.header-logo {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.header-title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--moura-blue);
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   MODE INDICATOR & STATUS
+   ============================================================ */
 .mode-indicator,
 #status-feed {
   position: absolute;
-  right: 20px;
+  right: 16px;
   padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: rgba(0, 0, 0, 0.42);
+  border-radius: 10px;
+  border: 1.5px solid var(--moura-blue);
+  background: var(--panel-bg);
   backdrop-filter: blur(8px);
   font-size: 12px;
-  letter-spacing: 1px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  color: var(--moura-text);
+  box-shadow: var(--shadow-soft);
 }
 
-.mode-indicator { top: 20px; }
+.mode-indicator { top: 16px; }
 #status-feed {
   top: 64px;
-  color: var(--cyan);
+  color: var(--moura-blue);
   min-width: 280px;
   text-align: right;
 }
@@ -100,16 +118,16 @@ body::before {
    BOTÃO DE AJUDA (colapsável no mobile)
    ============================================================ */
 #help-toggle {
-  display: none; /* oculto no desktop — visível via media query */
+  display: none;
   position: absolute;
   top: 62px;
-  left: 20px;
+  left: 16px;
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1px solid rgba(0, 242, 254, 0.4);
-  background: var(--panel);
-  color: var(--cyan);
+  border: 2px solid var(--moura-blue);
+  background: var(--panel-bg);
+  color: var(--moura-blue);
   font-size: 16px;
   font-weight: 800;
   cursor: pointer;
@@ -117,6 +135,7 @@ body::before {
   z-index: 10;
   backdrop-filter: blur(8px);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-soft);
 }
 
 #help-toggle:active {
@@ -124,7 +143,9 @@ body::before {
 }
 
 #help-toggle.active {
-  box-shadow: 0 0 16px rgba(0, 242, 254, 0.5);
+  background: var(--moura-blue);
+  color: var(--moura-white);
+  box-shadow: 0 0 12px rgba(0, 74, 153, 0.35);
 }
 
 /* ============================================================
@@ -133,26 +154,28 @@ body::before {
 #controls-summary {
   position: absolute;
   top: 88px;
-  left: 20px;
+  left: 16px;
   width: 210px;
-  background: var(--panel);
-  border: 1px solid rgba(0, 242, 254, 0.24);
-  border-radius: 14px;
+  background: var(--panel-bg);
+  border: 1.5px solid var(--moura-blue);
+  border-radius: 12px;
   padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 0 30px rgba(0, 242, 254, 0.08);
+  box-shadow: var(--shadow-medium);
   pointer-events: auto;
 }
 
 .control-header {
   font-size: 10px;
-  color: var(--cyan);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-weight: 700;
+  color: var(--moura-blue);
+  border-bottom: 1px solid var(--moura-gray-border);
   padding-bottom: 5px;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
 }
 
 .control-item {
@@ -160,7 +183,8 @@ body::before {
   align-items: center;
   gap: 8px;
   font-size: 11px;
-  color: #d3e4f1;
+  color: var(--moura-text-secondary);
+  font-weight: 500;
 }
 
 .control-icon {
@@ -175,27 +199,27 @@ body::before {
    ============================================================ */
 #chat-container {
   position: absolute;
-  left: 20px;
-  bottom: 20px;
-  width: min(360px, calc(100vw - 40px));
+  left: 16px;
+  bottom: 16px;
+  width: min(360px, calc(100vw - 32px));
   height: 310px;
-  background: rgba(2, 10, 22, 0.9);
-  border: 1px solid rgba(0, 242, 254, 0.4);
-  border-radius: 16px;
+  background: var(--panel-bg);
+  border: 1.5px solid var(--moura-blue);
+  border-radius: 14px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   pointer-events: auto;
   backdrop-filter: blur(12px);
-  box-shadow: 0 0 35px rgba(0, 242, 254, 0.12);
+  box-shadow: var(--shadow-medium);
 }
 
 #chat-header {
   padding: 12px 15px;
-  background: rgba(0, 242, 254, 0.12);
-  border-bottom: 1px solid rgba(0, 242, 254, 0.25);
-  color: var(--cyan);
-  font-size: 14px;
+  background: var(--moura-blue);
+  border-bottom: none;
+  color: var(--moura-white);
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 1px;
   display: flex;
@@ -212,6 +236,7 @@ body::before {
   flex-direction: column;
   gap: 10px;
   font-size: 12px;
+  background: var(--moura-white);
 }
 
 #chat-history::-webkit-scrollbar,
@@ -221,7 +246,7 @@ body::before {
 
 #chat-history::-webkit-scrollbar-thumb,
 .info-desc::-webkit-scrollbar-thumb {
-  background: var(--cyan);
+  background: var(--moura-blue);
   border-radius: 999px;
 }
 
@@ -240,25 +265,25 @@ body::before {
 }
 
 .msg-ai {
-  background: rgba(0, 242, 254, 0.1);
-  color: #ddfbff;
+  background: rgba(0, 74, 153, 0.08);
+  color: var(--moura-text);
   align-self: flex-start;
-  border-left: 3px solid var(--cyan);
+  border-left: 3px solid var(--moura-blue);
 }
 
 .msg-user {
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
+  background: var(--moura-gray-light);
+  color: var(--moura-text);
   align-self: flex-end;
   text-align: right;
-  border-right: 3px solid rgba(255,255,255,0.4);
+  border-right: 3px solid var(--moura-blue-light);
 }
 
 .msg-error {
-  background: rgba(255, 75, 110, 0.18);
-  color: #ffd9e0;
+  background: var(--moura-yellow-soft);
+  color: var(--moura-text);
   align-self: flex-start;
-  border-left: 3px solid var(--red);
+  border-left: 3px solid var(--moura-yellow);
 }
 
 .typing-indicator {
@@ -271,7 +296,7 @@ body::before {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--cyan);
+  background: var(--moura-blue);
   animation: blink 1.4s infinite ease-in-out both;
 }
 
@@ -286,27 +311,38 @@ body::before {
 #chat-input-area {
   display: flex;
   padding: 6px;
-  border-top: 1px solid rgba(0, 242, 254, 0.2);
-  background: rgba(0,0,0,0.26);
+  border-top: 1px solid var(--moura-gray-border);
+  background: var(--moura-gray-light);
 }
 
 #chat-input {
   flex: 1;
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--moura-text);
   outline: none;
   padding: 10px;
   font-family: inherit;
+  font-size: 13px;
+}
+
+#chat-input::placeholder {
+  color: var(--moura-text-secondary);
 }
 
 #chat-send {
   border: none;
   background: transparent;
-  color: var(--cyan);
+  color: var(--moura-blue);
   font-size: 18px;
   padding: 0 14px;
   cursor: pointer;
+  font-weight: 700;
+  transition: color 0.15s;
+}
+
+#chat-send:hover {
+  color: var(--moura-blue-dark);
 }
 
 /* ============================================================
@@ -314,16 +350,16 @@ body::before {
    ============================================================ */
 #info-panel {
   position: absolute;
-  right: 30px;
+  right: 24px;
   top: 50%;
   transform: translateY(-50%);
   width: min(340px, calc(100vw - 60px));
-  background: var(--panel);
-  border-right: 4px solid var(--cyan);
-  border-top: 1px solid rgba(0, 242, 254, 0.25);
-  border-bottom: 1px solid rgba(0, 242, 254, 0.25);
-  border-radius: 18px 0 0 18px;
-  box-shadow: -10px 0 30px rgba(0,0,0,0.6);
+  background: var(--panel-bg);
+  border-right: 4px solid var(--moura-blue);
+  border-top: 1px solid var(--moura-gray-border);
+  border-bottom: 1px solid var(--moura-gray-border);
+  border-radius: 14px 0 0 14px;
+  box-shadow: var(--shadow-medium);
   padding: 24px;
   text-align: right;
   display: none;
@@ -348,21 +384,22 @@ body::before {
 }
 
 .info-title {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
-  color: var(--cyan);
+  color: var(--moura-blue);
   text-transform: uppercase;
-  text-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
+  letter-spacing: 0.5px;
 }
 
 .info-coord {
   margin: 4px 0 10px;
   padding-bottom: 6px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  font-family: "Courier New", monospace;
+  border-bottom: 1px solid var(--moura-gray-border);
+  font-family: 'Inter', monospace;
   font-size: 11px;
-  color: var(--blue);
+  color: var(--moura-blue-light);
   letter-spacing: 1px;
+  font-weight: 600;
 }
 
 .info-desc {
@@ -370,10 +407,10 @@ body::before {
   overflow-y: auto;
   padding-left: 12px;
   margin-left: 10px;
-  border-left: 2px solid rgba(255,255,255,0.1);
+  border-left: 2px solid var(--moura-blue);
   font-size: 12px;
   line-height: 1.6;
-  color: #e6eef9;
+  color: var(--moura-text-secondary);
 }
 
 .info-stats {
@@ -384,8 +421,8 @@ body::before {
 }
 
 .info-stats div {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: var(--moura-gray-light);
+  border: 1px solid var(--moura-gray-border);
   border-radius: 10px;
   padding: 8px 10px;
 }
@@ -393,15 +430,18 @@ body::before {
 .info-stats span {
   display: block;
   font-size: 9px;
-  opacity: 0.72;
+  font-weight: 700;
+  color: var(--moura-text-secondary);
   letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .info-stats strong {
   display: block;
   margin-top: 3px;
-  color: var(--cyan);
+  color: var(--moura-blue);
   font-size: 12px;
+  font-weight: 700;
 }
 
 /* ============================================================
@@ -415,7 +455,7 @@ body::before {
   height: 72px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  border: 1px dashed rgba(255, 255, 255, 0.3);
+  border: 1px dashed rgba(0, 74, 153, 0.25);
   transition: 0.25s ease;
 }
 
@@ -423,7 +463,7 @@ body::before {
 #crosshair::after {
   content: "";
   position: absolute;
-  background: rgba(255,255,255,0.22);
+  background: rgba(0, 74, 153, 0.18);
 }
 
 #crosshair::before {
@@ -443,13 +483,28 @@ body::before {
 }
 
 .scanning #crosshair {
-  border-color: var(--cyan);
-  box-shadow: 0 0 20px rgba(0, 242, 254, 0.6);
+  border-color: var(--moura-blue);
+  box-shadow: 0 0 12px rgba(0, 74, 153, 0.3);
   transform: translate(-50%, -50%) scale(1.12);
 }
 
 /* ============================================================
-   LOADING
+   GPS DATA
+   ============================================================ */
+#gps-data {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--moura-blue);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ============================================================
+   LOADING SCREEN — Moura Branding
    ============================================================ */
 #loading {
   position: absolute;
@@ -458,19 +513,69 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #010307;
-  color: var(--cyan);
-  font-weight: 700;
-  letter-spacing: 2px;
+  background: var(--moura-white);
 }
 
-.status-neutral { color: #8a93a8; }
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+
+.loading-logo {
+  width: 180px;
+  height: auto;
+  object-fit: contain;
+}
+
+.loading-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--moura-blue);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.loading-bar-track {
+  width: 240px;
+  height: 4px;
+  background: var(--moura-gray-light);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.loading-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--moura-blue), var(--moura-yellow));
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  animation: loadingPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes loadingPulse {
+  0% { width: 10%; }
+  50% { width: 70%; }
+  100% { width: 95%; }
+}
+
+.loading-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--moura-text-secondary);
+  letter-spacing: 1px;
+}
+
+.status-neutral { color: var(--moura-text-secondary); }
 
 /* ============================================================
    MEDIA QUERIES — Tablets (max-width: 900px)
    ============================================================ */
 @media (max-width: 900px) {
-  .logo { font-size: 18px; max-width: 55vw; }
+  .header-title { font-size: 16px; }
+  .header-logo { height: 30px; }
   #controls-summary { width: 195px; }
 }
 
@@ -479,15 +584,23 @@ body::before {
    ============================================================ */
 @media (max-width: 768px) {
   .logo {
-    font-size: 15px;
-    max-width: 50vw;
-    top: 14px;
-    left: 14px;
+    top: 12px;
+    left: 12px;
+    gap: 8px;
+  }
+
+  .header-title {
+    font-size: 13px;
+    max-width: 40vw;
+  }
+
+  .header-logo {
+    height: 26px;
   }
 
   .mode-indicator {
-    top: 14px;
-    right: 14px;
+    top: 12px;
+    right: 12px;
     font-size: 10px;
     padding: 7px 10px;
   }
@@ -504,11 +617,11 @@ body::before {
   /* Controls summary — oculto por padrão, expansível via botão */
   #controls-summary {
     top: 104px;
-    left: 14px;
+    left: 12px;
     width: 175px;
     padding: 10px 12px;
     gap: 7px;
-    display: none; /* controlado via JS toggle */
+    display: none;
     border-radius: 12px;
     z-index: 5;
   }
@@ -547,11 +660,11 @@ body::before {
     width: 100%;
     max-height: var(--bottom-sheet-h);
     transform: none;
-    border-radius: 20px 20px 0 0;
+    border-radius: 18px 18px 0 0;
     border-right: none;
-    border-top: 2px solid rgba(0, 242, 254, 0.35);
+    border-top: 3px solid var(--moura-blue);
     border-bottom: none;
-    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 -6px 30px rgba(0, 74, 153, 0.12);
     padding: 10px 20px 18px;
     text-align: left;
     overflow-y: auto;
@@ -573,7 +686,7 @@ body::before {
     display: block;
     width: 40px;
     height: 4px;
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--moura-gray-border);
     border-radius: 2px;
     margin: 0 auto 10px;
   }
@@ -592,6 +705,14 @@ body::before {
     padding-left: 10px;
   }
 
+  /* GPS Data */
+  #gps-data {
+    bottom: auto;
+    top: 44px;
+    right: 12px;
+    font-size: 8px;
+  }
+
   /* Chat — ajustes mobile */
   #chat-container {
     left: 10px;
@@ -600,13 +721,23 @@ body::before {
     bottom: 10px;
     height: 220px;
   }
+
+  /* Loading logo menor */
+  .loading-logo {
+    width: 140px;
+  }
+
+  .loading-title {
+    font-size: 18px;
+  }
 }
 
 /* ============================================================
    MEDIA QUERIES — Mobile pequeno (max-width: 480px)
    ============================================================ */
 @media (max-width: 480px) {
-  .logo { font-size: 13px; }
+  .header-title { font-size: 11px; }
+  .header-logo { height: 22px; }
   .mode-indicator { font-size: 9px; padding: 5px 8px; }
 
   #info-panel {
@@ -616,4 +747,7 @@ body::before {
 
   .info-title { font-size: 15px; }
   .info-desc { max-height: 65px; }
+
+  .loading-logo { width: 120px; }
+  .loading-title { font-size: 16px; }
 }

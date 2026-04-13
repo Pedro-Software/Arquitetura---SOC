@@ -27,14 +27,18 @@ const CONFIG = {
 const API_KEY = 'SUA_CHAVE_AQUI';
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 
+// ============================================================
+// PALETA MOURA — Engenharia Industrial Moderna
+// ============================================================
 const palette = {
-  cyan: 0x00f2fe,
-  blue: 0x4facfe,
-  red: 0xff4b6e,
-  lime: 0x9eff6e,
-  violet: 0xa855f7,
-  white: 0xe6fbff,
-  amber: 0xffb84d
+  primary:    0x004a99,   // Azul Moura
+  accent:     0xffcc00,   // Amarelo Moura
+  white:      0xffffff,
+  lightGray:  0xe0e4e8,
+  midGray:    0x9ca3af,
+  darkGray:   0x4b5563,
+  warmGray:   0xf3f4f6,
+  steel:      0xc8cdd3,   // Aço industrial
 };
 
 const ARCHITECTURE_KB = {
@@ -68,6 +72,7 @@ const ARCHITECTURE_KB = {
 // DOM — Referências defensivas com optional chaining
 // ============================================================
 const loadingScreen = document.getElementById('loading');
+const loadingText = document.getElementById('loading-text');
 const uiLayer = document.getElementById('ui-layer');
 const outputCanvas = document.getElementById('output_canvas');
 
@@ -92,7 +97,7 @@ const controlsSummary = document.getElementById('controls-summary');
 // HELPERS UI
 // ============================================================
 function setLoadingMessage(message) {
-  if (loadingScreen) loadingScreen.innerText = message;
+  if (loadingText) loadingText.innerText = message;
 }
 
 function hideLoading() {
@@ -103,14 +108,15 @@ function showFatalError(message) {
   console.error(message);
   if (loadingScreen) {
     loadingScreen.style.display = 'flex';
-    loadingScreen.style.color = '#ff6b6b';
-    loadingScreen.style.textAlign = 'center';
-    loadingScreen.style.padding = '24px';
-    loadingScreen.innerText = message;
+    const text = loadingScreen.querySelector('.loading-text');
+    if (text) {
+      text.style.color = '#cc0000';
+      text.innerText = message;
+    }
   }
 }
 
-function setMode(text, color = '#8a93a8') {
+function setMode(text, color = '#4b5563') {
   if (!modeLabel) return;
   modeLabel.innerText = text;
   modeLabel.style.color = color;
@@ -164,11 +170,11 @@ window.addEventListener('unhandledrejection', (event) => {
 });
 
 // ============================================================
-// THREE SCENE
+// THREE SCENE — Fundo Branco, Iluminação Industrial
 // ============================================================
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x02040a);
-scene.fog = new THREE.FogExp2(0x02040a, 0.026);
+scene.background = new THREE.Color(0xffffff);
+scene.fog = new THREE.FogExp2(0xffffff, 0.014);
 
 // FOV dinâmico — telas verticais recebem FOV maior para não parecer zoom exagerado
 function computeFov() {
@@ -194,7 +200,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(CONFIG.isMobile ? 1.2 : Math.min(window.devicePixelRatio, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+renderer.toneMappingExposure = 1.2;
 
 const architectureGroup = new THREE.Group();
 scene.add(architectureGroup);
@@ -273,22 +279,22 @@ function checkFpsAndAdapt() {
 }
 
 // ============================================================
-// MATERIAIS / LABELS
+// MATERIAIS — Estilo Industrial (sem glow neon)
 // ============================================================
-function makeGlowMaterial(color, options = {}) {
+function makeIndustrialMaterial(color, options = {}) {
   return new THREE.MeshStandardMaterial({
     color,
-    emissive: color,
-    emissiveIntensity: options.emissiveIntensity ?? 1.35,
-    metalness: options.metalness ?? 0.45,
-    roughness: options.roughness ?? 0.28,
+    emissive: options.emissive ?? color,
+    emissiveIntensity: options.emissiveIntensity ?? 0.12,
+    metalness: options.metalness ?? 0.65,
+    roughness: options.roughness ?? 0.42,
     transparent: options.transparent ?? false,
     opacity: options.opacity ?? 1,
     side: options.side ?? THREE.FrontSide
   });
 }
 
-function createLabelSprite(text, color = '#00f2fe', width = 512, height = 128) {
+function createLabelSprite(text, color = '#004a99', width = 512, height = 128) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
@@ -296,11 +302,12 @@ function createLabelSprite(text, color = '#00f2fe', width = 512, height = 128) {
   canvas.height = height;
 
   ctx.clearRect(0, 0, width, height);
-  ctx.font = 'bold 34px Segoe UI';
+  ctx.font = 'bold 34px Inter, Segoe UI, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 20;
+  // Sombra sutil para legibilidade sobre fundo branco
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+  ctx.shadowBlur = 6;
   ctx.fillStyle = color;
   ctx.fillText(text, width / 2, height / 2);
 
@@ -321,7 +328,7 @@ function createLabelSprite(text, color = '#00f2fe', width = 512, height = 128) {
 
 function createPortRow({
   count = 8, startX = -1, y = 0, z = 0.52,
-  spacing = 0.28, color = 0x9fb3c8, ledColor = 0x00f2fe
+  spacing = 0.28, color = 0xb0bec5, ledColor = palette.primary
 } = {}) {
   const group = new THREE.Group();
   for (let i = 0; i < count; i++) {
@@ -342,15 +349,15 @@ function createPortRow({
   return group;
 }
 
-function createEnterpriseFrame(width, height, depth, edgeColor = palette.cyan) {
+function createEnterpriseFrame(width, height, depth, edgeColor = palette.primary) {
   return new THREE.LineSegments(
     new THREE.EdgesGeometry(new THREE.BoxGeometry(width, height, depth)),
-    new THREE.LineBasicMaterial({ color: edgeColor, transparent: true, opacity: 0.28 })
+    new THREE.LineBasicMaterial({ color: edgeColor, transparent: true, opacity: 0.45 })
   );
 }
 
 function createDashboardScreen({
-  title = 'WAZUH SIEM', subtitle = 'SOC ANALYTICS', accent = '#7ff9ff'
+  title = 'WAZUH SIEM', subtitle = 'SOC ANALYTICS', accent = '#004a99'
 } = {}) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
@@ -360,55 +367,54 @@ function createDashboardScreen({
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = 'rgba(5,16,30,0.96)';
+  // Fundo branco com leve cinza
+  ctx.fillStyle = '#f8f9fb';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  // Borda do painel
   ctx.strokeStyle = accent;
   ctx.lineWidth = 4;
   ctx.strokeRect(18, 18, canvas.width - 36, canvas.height - 36);
 
-  const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
-  grad.addColorStop(0, 'rgba(0,242,254,0.12)');
-  grad.addColorStop(0.5, 'rgba(79,172,254,0.22)');
-  grad.addColorStop(1, 'rgba(0,242,254,0.08)');
-  ctx.fillStyle = grad;
+  // Header bar
+  ctx.fillStyle = '#004a99';
   ctx.fillRect(18, 18, canvas.width - 36, 70);
 
-  ctx.shadowColor = accent;
-  ctx.shadowBlur = 14;
-  ctx.fillStyle = accent;
-  ctx.font = 'bold 52px Segoe UI';
-  ctx.fillText(title, 48, 82);
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 44px Inter, Segoe UI, sans-serif';
+  ctx.fillText(title, 48, 72);
 
-  ctx.shadowBlur = 8;
-  ctx.fillStyle = '#b9faff';
-  ctx.font = '28px Segoe UI';
+  ctx.fillStyle = '#004a99';
+  ctx.font = '26px Inter, Segoe UI, sans-serif';
   ctx.fillText(subtitle, 50, 126);
 
-  ctx.shadowBlur = 0;
-  ctx.strokeStyle = 'rgba(0,242,254,0.55)';
+  // Event Panel
+  ctx.strokeStyle = '#004a99';
   ctx.lineWidth = 2;
   ctx.strokeRect(50, 165, 250, 220);
 
-  ctx.fillStyle = '#89f8ff';
-  ctx.font = 'bold 24px Segoe UI';
+  ctx.fillStyle = '#004a99';
+  ctx.font = 'bold 22px Inter, Segoe UI, sans-serif';
   ctx.fillText('EVENTS', 70, 200);
 
   const bars = [120, 150, 95, 180, 135];
   bars.forEach((w, i) => {
-    ctx.fillStyle = i % 2 === 0 ? 'rgba(0,242,254,0.75)' : 'rgba(126,255,214,0.75)';
+    ctx.fillStyle = i % 2 === 0 ? '#004a99' : '#ffcc00';
     ctx.fillRect(70, 225 + i * 28, w, 16);
   });
 
-  ctx.strokeStyle = 'rgba(79,172,254,0.55)';
+  // Alert Flow panel
+  ctx.strokeStyle = '#0066cc';
   ctx.strokeRect(340, 165, 300, 220);
 
-  ctx.fillStyle = '#9fd8ff';
-  ctx.font = 'bold 24px Segoe UI';
+  ctx.fillStyle = '#004a99';
+  ctx.font = 'bold 22px Inter, Segoe UI, sans-serif';
   ctx.fillText('ALERT FLOW', 360, 200);
 
   ctx.beginPath();
-  ctx.strokeStyle = 'rgba(0,242,254,0.95)';
+  ctx.strokeStyle = '#004a99';
   ctx.lineWidth = 4;
   ctx.moveTo(365, 325);
   ctx.lineTo(410, 285);
@@ -420,26 +426,31 @@ function createDashboardScreen({
 
   [[410, 285], [470, 300], [530, 235], [590, 255], [615, 220]].forEach(([x, y]) => {
     ctx.beginPath();
-    ctx.fillStyle = '#c9ffff';
+    ctx.fillStyle = '#ffcc00';
     ctx.arc(x, y, 6, 0, Math.PI * 2);
     ctx.fill();
   });
 
-  ctx.strokeStyle = 'rgba(168,85,247,0.6)';
+  // IOC Matches panel
+  ctx.strokeStyle = '#004a99';
+  ctx.lineWidth = 2;
   ctx.strokeRect(680, 165, 280, 100);
-  ctx.strokeStyle = 'rgba(158,255,110,0.6)';
+  // Agents Health panel
+  ctx.strokeStyle = '#ffcc00';
   ctx.strokeRect(680, 285, 280, 100);
 
-  ctx.fillStyle = '#d6b3ff';
-  ctx.font = 'bold 20px Segoe UI';
+  ctx.fillStyle = '#004a99';
+  ctx.font = 'bold 20px Inter, Segoe UI, sans-serif';
   ctx.fillText('IOC MATCHES', 700, 205);
 
-  ctx.fillStyle = '#baff9d';
+  ctx.fillStyle = '#333333';
   ctx.fillText('AGENTS HEALTH', 700, 325);
 
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 34px Segoe UI';
+  ctx.fillStyle = '#004a99';
+  ctx.font = 'bold 34px Inter, Segoe UI, sans-serif';
   ctx.fillText('284', 835, 208);
+
+  ctx.fillStyle = '#009933';
   ctx.fillText('97%', 840, 328);
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -453,18 +464,18 @@ function createDashboardScreen({
 }
 
 // ============================================================
-// CONSTRUTORES DE CENA
+// CONSTRUTORES DE CENA — Estética Industrial Moura
 // ============================================================
 function createPanelGrid() {
-  const grid = new THREE.GridHelper(60, 60, palette.cyan, 0x113366);
+  const grid = new THREE.GridHelper(60, 60, palette.primary, 0xd1d5db);
   grid.position.y = -5.4;
   grid.material.transparent = true;
-  grid.material.opacity = 0.16;
+  grid.material.opacity = 0.22;
   architectureGroup.add(grid);
 
   const plane = new THREE.Mesh(
     new THREE.CircleGeometry(26, 64),
-    new THREE.MeshBasicMaterial({ color: 0x0a1730, transparent: true, opacity: 0.18 })
+    new THREE.MeshBasicMaterial({ color: 0xf0f2f5, transparent: true, opacity: 0.3 })
   );
   plane.rotation.x = -Math.PI / 2;
   plane.position.y = -5.45;
@@ -487,75 +498,81 @@ function createBackgroundParticles() {
 
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
 
+  // Partículas em Azul Moura sutil (não brancas sobre branco)
   const material = new THREE.PointsMaterial({
-    color: palette.white, size: 0.12, transparent: true, opacity: 0.55
+    color: palette.primary, size: 0.12, transparent: true, opacity: 0.22
   });
 
   scene.add(new THREE.Points(geometry, material));
 }
 
 function addSceneLights() {
-  scene.add(new THREE.HemisphereLight(0x66ccff, 0x05070b, 0.55));
+  // Ambiente branca forte — iluminação de estúdio industrial
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xf0f0f0, 0.85));
 
-  const key = new THREE.DirectionalLight(0x9ee8ff, 1.6);
-  key.position.set(7, 12, 14);
+  // Luz direcional tipo "sol" industrial — clara e limpa
+  const key = new THREE.DirectionalLight(0xffffff, 1.8);
+  key.position.set(7, 14, 14);
   scene.add(key);
 
-  const rim = new THREE.PointLight(0x00f2fe, 2.0, 70, 2);
+  // Rim light suave azulada
+  const rim = new THREE.PointLight(0xd0e4ff, 1.2, 70, 2);
   rim.position.set(0, 8, 8);
   scene.add(rim);
 
-  const attackLight = new THREE.PointLight(0xff4b6e, 1.8, 40, 2);
-  attackLight.position.set(-11, 2.5, 4);
-  scene.add(attackLight);
-
-  const intelLight = new THREE.PointLight(0xa855f7, 1.7, 35, 2);
-  intelLight.position.set(11, 1.5, 4);
-  scene.add(intelLight);
+  // Fill light sutil do outro lado
+  const fill = new THREE.DirectionalLight(0xf5f5f5, 0.6);
+  fill.position.set(-8, 6, -6);
+  scene.add(fill);
 }
 
-function createServerRack({ title, color = palette.red, accent = palette.amber }) {
+function createServerRack({ title, color = palette.accent, accent = palette.primary }) {
   const group = new THREE.Group();
 
+  // Corpo do rack — Cinza Claro industrial
   const outer = new THREE.Mesh(
     new THREE.BoxGeometry(2.5, 4.8, 1.8),
-    new THREE.MeshStandardMaterial({ color: 0x0c1118, metalness: 0.82, roughness: 0.34 })
+    new THREE.MeshStandardMaterial({ color: palette.lightGray, metalness: 0.72, roughness: 0.38 })
   );
   group.add(outer);
 
+  // Frente do rack — Branco
   const front = new THREE.Mesh(
     new THREE.BoxGeometry(2.28, 4.45, 0.08),
-    new THREE.MeshStandardMaterial({ color: 0x131b26, metalness: 0.7, roughness: 0.42 })
+    new THREE.MeshStandardMaterial({ color: 0xf0f2f5, metalness: 0.5, roughness: 0.45 })
   );
   front.position.z = 0.9;
   group.add(front);
 
-  group.add(createEnterpriseFrame(2.36, 4.56, 1.86, color));
+  // Frame em Azul Moura
+  group.add(createEnterpriseFrame(2.36, 4.56, 1.86, palette.primary));
 
   for (let i = 0; i < 6; i++) {
     const unit = new THREE.Mesh(
       new THREE.BoxGeometry(1.95, 0.45, 0.08),
-      new THREE.MeshStandardMaterial({ color: 0x1a2430, metalness: 0.75, roughness: 0.38 })
+      new THREE.MeshStandardMaterial({ color: palette.steel, metalness: 0.65, roughness: 0.4 })
     );
     unit.position.set(0, 1.55 - i * 0.68, 0.95);
     group.add(unit);
 
+    // Strips alternando Azul Moura / Amarelo Moura
     const strip = new THREE.Mesh(
       new THREE.BoxGeometry(1.65, 0.04, 0.02),
-      new THREE.MeshBasicMaterial({ color: i % 2 === 0 ? color : accent })
+      new THREE.MeshBasicMaterial({ color: i % 2 === 0 ? palette.primary : palette.accent })
     );
     strip.position.set(-0.05, 1.55 - i * 0.68, 1.01);
     group.add(strip);
 
+    // LEDs
     const led = new THREE.Mesh(
       new THREE.BoxGeometry(0.07, 0.07, 0.03),
-      new THREE.MeshBasicMaterial({ color: i % 2 === 0 ? accent : color })
+      new THREE.MeshBasicMaterial({ color: i % 2 === 0 ? palette.accent : palette.primary })
     );
     led.position.set(0.92, 1.55 - i * 0.68, 1.01);
     group.add(led);
   }
 
-  const label = createLabelSprite(title, '#ff8fa3');
+  const label = createLabelSprite(title, '#004a99');
   label.position.set(0, 3.7, 0);
   group.add(label);
 
@@ -565,45 +582,52 @@ function createServerRack({ title, color = palette.red, accent = palette.amber }
 function createFirewallNode() {
   const group = new THREE.Group();
 
+  // Corpo da appliance — Cinza claro industrial
   group.add(new THREE.Mesh(
     new THREE.BoxGeometry(3.2, 1.0, 1.4),
-    new THREE.MeshStandardMaterial({ color: 0x101821, metalness: 0.82, roughness: 0.34 })
+    new THREE.MeshStandardMaterial({ color: palette.lightGray, metalness: 0.72, roughness: 0.38 })
   ));
 
-  const topGlow = new THREE.Mesh(
+  // Top bar sólida Azul Moura
+  const topBar = new THREE.Mesh(
     new THREE.BoxGeometry(3.0, 0.06, 1.2),
-    new THREE.MeshBasicMaterial({ color: palette.cyan, transparent: true, opacity: 0.22 })
+    new THREE.MeshBasicMaterial({ color: palette.primary })
   );
-  topGlow.position.y = 0.38;
-  group.add(topGlow);
+  topBar.position.y = 0.38;
+  group.add(topBar);
 
+  // Frente — branco industrial
   const frontPlate = new THREE.Mesh(
     new THREE.BoxGeometry(3.0, 0.74, 0.06),
-    new THREE.MeshStandardMaterial({ color: 0x192431, metalness: 0.72, roughness: 0.4 })
+    new THREE.MeshStandardMaterial({ color: 0xf0f2f5, metalness: 0.55, roughness: 0.42 })
   );
   frontPlate.position.z = 0.73;
   group.add(frontPlate);
 
-  group.add(createPortRow({ count: 6, startX: -1.0, y: 0.12, z: 0.78, spacing: 0.32, color: 0x8fa2b6, ledColor: palette.lime }));
-  group.add(createPortRow({ count: 6, startX: -1.0, y: -0.16, z: 0.78, spacing: 0.32, color: 0x8fa2b6, ledColor: palette.cyan }));
+  // Portas com LEDs Azul e Amarelo Moura
+  group.add(createPortRow({ count: 6, startX: -1.0, y: 0.12, z: 0.78, spacing: 0.32, color: 0xb0bec5, ledColor: palette.accent }));
+  group.add(createPortRow({ count: 6, startX: -1.0, y: -0.16, z: 0.78, spacing: 0.32, color: 0xb0bec5, ledColor: palette.primary }));
 
+  // Marca lateral — Amarelo Moura
   const sideMark = new THREE.Mesh(
     new THREE.BoxGeometry(0.42, 0.42, 0.03),
-    new THREE.MeshBasicMaterial({ color: palette.lime })
+    new THREE.MeshBasicMaterial({ color: palette.accent })
   );
   sideMark.position.set(1.18, 0.0, 0.79);
   group.add(sideMark);
 
-  group.add(createEnterpriseFrame(3.28, 1.08, 1.48, palette.cyan));
+  // Frame Azul Moura
+  group.add(createEnterpriseFrame(3.28, 1.08, 1.48, palette.primary));
 
+  // Pedestal sutil
   const pedestal = new THREE.Mesh(
     new THREE.CylinderGeometry(1.25, 1.45, 0.12, 40),
-    new THREE.MeshBasicMaterial({ color: palette.cyan, transparent: true, opacity: 0.16 })
+    new THREE.MeshBasicMaterial({ color: palette.primary, transparent: true, opacity: 0.12 })
   );
   pedestal.position.y = -0.72;
   group.add(pedestal);
 
-  const label = createLabelSprite('SURICATA FIREWALL', '#8ffcff', 620, 120);
+  const label = createLabelSprite('SURICATA FIREWALL', '#004a99', 620, 120);
   label.scale.set(4.8, 0.95, 1);
   label.position.set(0, 1.85, 0);
   group.add(label);
@@ -614,54 +638,58 @@ function createFirewallNode() {
 function createSiemNode() {
   const group = new THREE.Group();
 
+  // Mesa — Cinza claro industrial
   const desk = new THREE.Mesh(
     new THREE.BoxGeometry(4.6, 0.6, 2.1),
-    new THREE.MeshStandardMaterial({ color: 0x0d141d, metalness: 0.88, roughness: 0.28 })
+    new THREE.MeshStandardMaterial({ color: palette.lightGray, metalness: 0.78, roughness: 0.32 })
   );
   desk.position.y = -2.0;
   group.add(desk);
 
-  const deskFrame = createEnterpriseFrame(4.72, 0.68, 2.18, palette.cyan);
+  const deskFrame = createEnterpriseFrame(4.72, 0.68, 2.18, palette.primary);
   deskFrame.position.copy(desk.position);
   group.add(deskFrame);
 
+  // Pedestal
   const pedestal = new THREE.Mesh(
     new THREE.BoxGeometry(0.8, 2.3, 0.65),
-    new THREE.MeshStandardMaterial({ color: 0x172332, metalness: 0.8, roughness: 0.28 })
+    new THREE.MeshStandardMaterial({ color: palette.steel, metalness: 0.7, roughness: 0.32 })
   );
   pedestal.position.set(0, -0.58, -1.05);
   group.add(pedestal);
 
-  const pedestalGlow = new THREE.Mesh(
+  // Sem glow de pedestal — apenas sutil hint Azul
+  const pedestalAccent = new THREE.Mesh(
     new THREE.BoxGeometry(0.68, 2.0, 0.55),
-    new THREE.MeshBasicMaterial({ color: palette.cyan, transparent: true, opacity: 0.06, depthWrite: false, depthTest: false })
+    new THREE.MeshBasicMaterial({ color: palette.primary, transparent: true, opacity: 0.04, depthWrite: false, depthTest: false })
   );
-  pedestalGlow.position.set(0, -0.58, -0.98);
-  group.add(pedestalGlow);
+  pedestalAccent.position.set(0, -0.58, -0.98);
+  group.add(pedestalAccent);
 
+  // Dashboard screens com tema Moura
   const mainScreen = new THREE.Mesh(
     new THREE.PlaneGeometry(3.2, 1.9),
-    createDashboardScreen({ title: 'WAZUH SIEM', subtitle: 'SOC ANALYTICS CORE', accent: '#7ff9ff' })
+    createDashboardScreen({ title: 'WAZUH SIEM', subtitle: 'SOC ANALYTICS CORE', accent: '#004a99' })
   );
   mainScreen.position.set(0, 1.0, 2.2);
   mainScreen.renderOrder = 100;
   group.add(mainScreen);
 
-  const mainScreenFrame = createEnterpriseFrame(3.28, 1.98, 0.03, palette.cyan);
+  const mainScreenFrame = createEnterpriseFrame(3.28, 1.98, 0.03, palette.primary);
   mainScreenFrame.position.copy(mainScreen.position);
   mainScreenFrame.renderOrder = 101;
   group.add(mainScreenFrame);
 
   const leftScreen = new THREE.Mesh(
     new THREE.PlaneGeometry(1.55, 1.0),
-    createDashboardScreen({ title: 'ALERTS', subtitle: 'SURICATA FEED', accent: '#8ffcff' })
+    createDashboardScreen({ title: 'ALERTS', subtitle: 'SURICATA FEED', accent: '#004a99' })
   );
   leftScreen.position.set(-2.25, 0.45, 1.75);
   leftScreen.rotation.y = 0.42;
   leftScreen.renderOrder = 100;
   group.add(leftScreen);
 
-  const leftFrame = createEnterpriseFrame(1.62, 1.06, 0.03, palette.cyan);
+  const leftFrame = createEnterpriseFrame(1.62, 1.06, 0.03, palette.primary);
   leftFrame.position.copy(leftScreen.position);
   leftFrame.rotation.copy(leftScreen.rotation);
   leftFrame.renderOrder = 101;
@@ -669,36 +697,38 @@ function createSiemNode() {
 
   const rightScreen = new THREE.Mesh(
     new THREE.PlaneGeometry(1.55, 1.0),
-    createDashboardScreen({ title: 'THREAT INTEL', subtitle: 'MISP SYNC', accent: '#d6a6ff' })
+    createDashboardScreen({ title: 'THREAT INTEL', subtitle: 'MISP SYNC', accent: '#004a99' })
   );
   rightScreen.position.set(2.25, 0.45, 1.75);
   rightScreen.rotation.y = -0.42;
   rightScreen.renderOrder = 100;
   group.add(rightScreen);
 
-  const rightFrame = createEnterpriseFrame(1.62, 1.06, 0.03, palette.violet);
+  const rightFrame = createEnterpriseFrame(1.62, 1.06, 0.03, palette.primary);
   rightFrame.position.copy(rightScreen.position);
   rightFrame.rotation.copy(rightScreen.rotation);
   rightFrame.renderOrder = 101;
   group.add(rightFrame);
 
+  // Painel traseiro sutil
   const backPanel = new THREE.Mesh(
     new THREE.PlaneGeometry(1.9, 3.3),
-    new THREE.MeshBasicMaterial({ color: 0x7feeff, transparent: true, opacity: 0.08, side: THREE.DoubleSide, depthWrite: false, depthTest: false })
+    new THREE.MeshBasicMaterial({ color: palette.primary, transparent: true, opacity: 0.05, side: THREE.DoubleSide, depthWrite: false, depthTest: false })
   );
   backPanel.position.set(0, 0.15, -1.45);
   backPanel.renderOrder = 2;
   group.add(backPanel);
 
-  const backPanelFrame = createEnterpriseFrame(1.98, 3.38, 0.03, palette.cyan);
+  const backPanelFrame = createEnterpriseFrame(1.98, 3.38, 0.03, palette.primary);
   backPanelFrame.position.copy(backPanel.position);
   backPanelFrame.renderOrder = 3;
   group.add(backPanelFrame);
 
+  // Torus rings — Azul Moura industrial
   for (let i = 0; i < 3; i++) {
     const ring = new THREE.Mesh(
       new THREE.TorusGeometry(1.55 + i * 0.22, 0.03, 16, 100),
-      makeGlowMaterial(i === 1 ? palette.white : palette.cyan, { emissiveIntensity: 1.4, transparent: true, opacity: 0.86 })
+      makeIndustrialMaterial(palette.primary, { emissiveIntensity: 0.2, transparent: true, opacity: 0.7 })
     );
     ring.rotation.x = Math.PI / 2;
     ring.position.y = -1.0 + i * 0.9;
@@ -706,15 +736,16 @@ function createSiemNode() {
     animatedRings.push({ mesh: ring, speed: 0.22 + i * 0.16, axis: i % 2 === 0 ? 'z' : 'y' });
   }
 
+  // Floor halo — Azul Moura sutil
   const floorHalo = new THREE.Mesh(
     new THREE.RingGeometry(1.2, 1.5, 64),
-    new THREE.MeshBasicMaterial({ color: palette.cyan, transparent: true, opacity: 0.24, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ color: palette.primary, transparent: true, opacity: 0.15, side: THREE.DoubleSide })
   );
   floorHalo.rotation.x = -Math.PI / 2;
   floorHalo.position.y = -2.28;
   group.add(floorHalo);
 
-  const label = createLabelSprite('WAZUH SIEM PLATFORM', '#8ffcff', 760, 120);
+  const label = createLabelSprite('WAZUH SIEM PLATFORM', '#004a99', 760, 120);
   label.scale.set(6.0, 0.95, 1);
   label.position.set(0, 3.45, 0);
   group.add(label);
@@ -725,9 +756,10 @@ function createSiemNode() {
 function createDatabaseNode() {
   const group = new THREE.Group();
 
+  // Clusters — Cinza claro industrial
   const clusterLeft = new THREE.Mesh(
     new THREE.BoxGeometry(1.3, 3.2, 1.4),
-    new THREE.MeshStandardMaterial({ color: 0x10141d, metalness: 0.82, roughness: 0.34 })
+    new THREE.MeshStandardMaterial({ color: palette.lightGray, metalness: 0.72, roughness: 0.38 })
   );
   clusterLeft.position.x = -0.9;
   group.add(clusterLeft);
@@ -736,13 +768,14 @@ function createDatabaseNode() {
   clusterRight.position.x = 0.9;
   group.add(clusterRight);
 
-  group.add((() => { const f = createEnterpriseFrame(1.36, 3.28, 1.48, palette.violet); f.position.x = -0.9; return f; })());
-  group.add((() => { const f = createEnterpriseFrame(1.36, 3.28, 1.48, palette.violet); f.position.x = 0.9; return f; })());
+  // Frames Azul Moura
+  group.add((() => { const f = createEnterpriseFrame(1.36, 3.28, 1.48, palette.primary); f.position.x = -0.9; return f; })());
+  group.add((() => { const f = createEnterpriseFrame(1.36, 3.28, 1.48, palette.primary); f.position.x = 0.9; return f; })());
 
   for (let i = 0; i < 5; i++) {
     const shelfL = new THREE.Mesh(
       new THREE.BoxGeometry(0.95, 0.32, 0.08),
-      new THREE.MeshStandardMaterial({ color: 0x1b2230, metalness: 0.72, roughness: 0.38 })
+      new THREE.MeshStandardMaterial({ color: palette.steel, metalness: 0.62, roughness: 0.4 })
     );
     shelfL.position.set(-0.9, 1.05 - i * 0.54, 0.74);
     group.add(shelfL);
@@ -751,9 +784,10 @@ function createDatabaseNode() {
     shelfR.position.x = 0.9;
     group.add(shelfR);
 
+    // Luzes alternando Azul / Amarelo Moura
     const lightL = new THREE.Mesh(
       new THREE.BoxGeometry(0.72, 0.03, 0.02),
-      new THREE.MeshBasicMaterial({ color: i % 2 === 0 ? palette.violet : palette.cyan })
+      new THREE.MeshBasicMaterial({ color: i % 2 === 0 ? palette.primary : palette.accent })
     );
     lightL.position.set(-0.95, 1.05 - i * 0.54, 0.8);
     group.add(lightL);
@@ -763,14 +797,15 @@ function createDatabaseNode() {
     group.add(lightR);
   }
 
+  // Bridge link
   const linkBridge = new THREE.Mesh(
     new THREE.BoxGeometry(0.55, 0.16, 0.4),
-    new THREE.MeshStandardMaterial({ color: 0x202a36, metalness: 0.72, roughness: 0.3 })
+    new THREE.MeshStandardMaterial({ color: palette.steel, metalness: 0.65, roughness: 0.35 })
   );
   linkBridge.position.set(0, 0.3, 0.65);
   group.add(linkBridge);
 
-  const label = createLabelSprite('MISP THREAT INTEL', '#d6a6ff', 760, 120);
+  const label = createLabelSprite('MISP THREAT INTEL', '#004a99', 760, 120);
   label.scale.set(6.0, 0.95, 1);
   label.position.set(0, 3.55, 0);
   group.add(label);
@@ -791,7 +826,7 @@ function createNode(metadata) {
 
   const pulse = new THREE.Mesh(
     new THREE.RingGeometry(1.4, 1.52, 64),
-    new THREE.MeshBasicMaterial({ color: metadata.color, transparent: true, opacity: 0.95, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ color: metadata.color, transparent: true, opacity: 0.7, side: THREE.DoubleSide })
   );
   pulse.rotation.x = -Math.PI / 2;
   pulse.position.y = -2.55;
@@ -821,21 +856,19 @@ function createFlow(start, end, color, labelText, arcHeight = 3.6, speed = 0.18)
 
   const line = new THREE.Line(
     geometry,
-    new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.8 })
+    new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.7 })
   );
   architectureGroup.add(line);
 
   const pulse = new THREE.Mesh(
     new THREE.SphereGeometry(0.18, 18, 18),
-    makeGlowMaterial(color, { emissiveIntensity: 1.6, metalness: 0.2, roughness: 0.08 })
+    makeIndustrialMaterial(color, { emissiveIntensity: 0.35, metalness: 0.3, roughness: 0.15 })
   );
   architectureGroup.add(pulse);
 
-  const label = createLabelSprite(
-    labelText,
-    color === palette.violet ? '#d6a6ff' : color === palette.red ? '#ff92a4' : '#8ffcff',
-    400, 96
-  );
+  // Labels com cores adequadas à paleta Moura
+  const labelColor = (color === palette.accent) ? '#cc9900' : '#004a99';
+  const label = createLabelSprite(labelText, labelColor, 400, 96);
   label.scale.set(3.1, 0.72, 1);
   const midPoint = curve.getPoint(0.5);
   label.position.copy(midPoint.add(new THREE.Vector3(0, 0.55, 0)));
@@ -854,77 +887,83 @@ function buildArchitecture() {
   createBackgroundParticles();
   addSceneLights();
 
+  // KALI — Nó de ataque: Amarelo Moura (alerta/crítico)
   const kali = createNode({
     id: 'KALI LINUX', title: ARCHITECTURE_KB['KALI LINUX'].title,
     type: ARCHITECTURE_KB['KALI LINUX'].type, status: ARCHITECTURE_KB['KALI LINUX'].status,
     description: ARCHITECTURE_KB['KALI LINUX'].description,
-    color: palette.red, position: new THREE.Vector3(-12.5, 0.4, 0),
-    factory: () => createServerRack({ title: 'KALI LINUX', color: palette.red, accent: palette.amber })
+    color: palette.accent, position: new THREE.Vector3(-12.5, 0.4, 0),
+    factory: () => createServerRack({ title: 'KALI LINUX', color: palette.accent, accent: palette.primary })
   });
 
+  // SURICATA — Perímetro: Azul Moura
   const suricata = createNode({
     id: 'SURICATA', title: ARCHITECTURE_KB.SURICATA.title,
     type: ARCHITECTURE_KB.SURICATA.type, status: ARCHITECTURE_KB.SURICATA.status,
     description: ARCHITECTURE_KB.SURICATA.description,
-    color: palette.cyan, position: new THREE.Vector3(-4.8, -0.2, 0),
+    color: palette.primary, position: new THREE.Vector3(-4.8, -0.2, 0),
     factory: () => createFirewallNode()
   });
 
+  // SIEM — Central: Azul Moura
   const siem = createNode({
     id: 'SIEM', title: 'Wazuh SIEM / SOC Platform',
     type: 'SOC / Correlation Platform', status: 'Correlação e monitoramento ativos',
     description: 'Console central do SOC com Wazuh para visualização de eventos, correlação, alertas e monitoramento operacional integrado ao fluxo de detecção e inteligência.',
-    color: palette.cyan, position: new THREE.Vector3(3.2, 0.3, 0),
+    color: palette.primary, position: new THREE.Vector3(3.2, 0.3, 0),
     hitRadius: 2.8, factory: () => createSiemNode()
   });
 
+  // MISP — Inteligência: Azul Moura
   const misp = createNode({
     id: 'MISP', title: ARCHITECTURE_KB.MISP.title,
     type: ARCHITECTURE_KB.MISP.type, status: ARCHITECTURE_KB.MISP.status,
     description: ARCHITECTURE_KB.MISP.description,
-    color: palette.violet, position: new THREE.Vector3(11.6, 0.15, 0),
+    color: palette.primary, position: new THREE.Vector3(11.6, 0.15, 0),
     factory: () => createDatabaseNode()
   });
 
+  // Fluxos — Amarelo Moura (alertas/hostil) e Azul Moura (dados normais)
   createFlow(
     kali.position.clone().add(new THREE.Vector3(1.2, 0.4, 0)),
     suricata.position.clone().add(new THREE.Vector3(-1.3, 0.2, 0)),
-    palette.red, 'TRÁFEGO HOSTIL', 3.1, 0.16
+    palette.accent, 'TRÁFEGO HOSTIL', 3.1, 0.16
   );
 
   createFlow(
     suricata.position.clone().add(new THREE.Vector3(1.3, 0.2, 0)),
     siem.position.clone().add(new THREE.Vector3(-1.8, 0.5, 0)),
-    palette.cyan, 'EVENTOS IDS/IPS', 3.8, 0.19
+    palette.primary, 'EVENTOS IDS/IPS', 3.8, 0.19
   );
 
   createFlow(
     siem.position.clone().add(new THREE.Vector3(1.75, 0.5, 0)),
     misp.position.clone().add(new THREE.Vector3(-1.5, 0.4, 0)),
-    palette.violet, 'REQUISIÇÃO IOC', 3.4, 0.14
+    palette.primary, 'REQUISIÇÃO IOC', 3.4, 0.14
   );
 
   createFlow(
     misp.position.clone().add(new THREE.Vector3(-1.45, -0.6, 0)),
     siem.position.clone().add(new THREE.Vector3(1.55, -0.4, 0)),
-    palette.lime, 'RETORNO INTEL', 2.0, 0.13
+    palette.accent, 'RETORNO INTEL', 2.0, 0.13
   );
 
+  // Painel lateral SOC
   const sidePanel = new THREE.Mesh(
     new THREE.BoxGeometry(4.5, 2.4, 0.15),
-    new THREE.MeshBasicMaterial({ color: 0x062948, transparent: true, opacity: 0.32 })
+    new THREE.MeshBasicMaterial({ color: palette.primary, transparent: true, opacity: 0.08 })
   );
   sidePanel.position.set(2.8, 5.6, -1.8);
   architectureGroup.add(sidePanel);
 
   const sidePanelEdges = new THREE.LineSegments(
     new THREE.EdgesGeometry(new THREE.BoxGeometry(4.5, 2.4, 0.15)),
-    new THREE.LineBasicMaterial({ color: palette.cyan, transparent: true, opacity: 0.65 })
+    new THREE.LineBasicMaterial({ color: palette.primary, transparent: true, opacity: 0.5 })
   );
   sidePanelEdges.position.copy(sidePanel.position);
   architectureGroup.add(sidePanelEdges);
 
-  const panelLabel = createLabelSprite('SOC SQUAD SI', '#8ffcff', 600, 120);
+  const panelLabel = createLabelSprite('SOC SQUAD SI', '#004a99', 600, 120);
   panelLabel.scale.set(4.5, 0.9, 1);
   panelLabel.position.set(2.8, 5.6, -1.65);
   architectureGroup.add(panelLabel);
@@ -932,7 +971,7 @@ function buildArchitecture() {
 
 const selectionMarker = new THREE.Mesh(
   new THREE.TorusGeometry(1.9, 0.05, 16, 100),
-  makeGlowMaterial(palette.cyan, { emissiveIntensity: 1.9, transparent: true, opacity: 0.85 })
+  makeIndustrialMaterial(palette.accent, { emissiveIntensity: 0.3, transparent: true, opacity: 0.85 })
 );
 selectionMarker.rotation.x = -Math.PI / 2;
 selectionMarker.visible = false;
@@ -991,7 +1030,7 @@ function animateNodes(elapsed) {
       const scale = 1 + Math.sin(elapsed * 2.2 + index) * 0.08;
       node.pulse.scale.set(scale, scale, scale);
       node.pulse.material.opacity = node === selectedNode
-        ? 1 : 0.72 + Math.sin(elapsed * 2 + index) * 0.18;
+        ? 0.85 : 0.5 + Math.sin(elapsed * 2 + index) * 0.15;
     }
 
     if (node.id === 'KALI LINUX') {
@@ -1070,7 +1109,7 @@ function fallbackCyberReply(question) {
   if (q.includes('misp')) return 'O MISP mantém inteligência de ameaças e enriquece indicadores usados pelo SIEM durante investigação e resposta.';
   if (q.includes('kali') || q.includes('atacante')) return 'O servidor Kali representa a origem ofensiva do fluxo, permitindo visualizar a cadeia ataque → detecção → correlação → inteligência.';
   if (q.includes('fluxo') || q.includes('arquitetura')) return 'O fluxo principal é Kali Linux atacante → firewall Suricata → painel SIEM → banco MISP, com retorno de inteligência para o SIEM.';
-  return 'A cena mostra uma arquitetura SOC holográfica com ataque, perímetro, correlação e inteligência de ameaças conectados por fluxos neon.';
+  return 'A cena mostra uma arquitetura SOC com ataque, perímetro, correlação e inteligência de ameaças conectados por fluxos visuais.';
 }
 
 async function askAI(question) {
@@ -1173,7 +1212,7 @@ function onPointerDown(event) {
   if (evCache.length === 2) {
     prevPinchDist = getPinchDistance();
     isDragging = true; // Evita seleção durante pinch
-    setMode('PINCH ZOOM', '#9eff6e');
+    setMode('PINCH ZOOM', '#ffcc00');
   }
 }
 
@@ -1226,7 +1265,7 @@ function onPointerUp(event) {
   if (evCache.length === 0) {
     isPointerDown = false;
     isDragging = false;
-    setMode('TOQUE PARA INTERAGIR', '#00f2fe');
+    setMode('TOQUE PARA INTERAGIR', '#004a99');
     setStatus(selectedNode ? `FOCO ATIVO EM ${selectedNode.id}` : 'LINK MONITORING INATIVO');
   }
 }
@@ -1266,7 +1305,7 @@ function initScene() {
   buildArchitecture();
   animate();
   setStatus('LINK MONITORING INATIVO');
-  setMode('TOQUE PARA INTERAGIR', '#00f2fe');
+  setMode('TOQUE PARA INTERAGIR', '#004a99');
 }
 
 function initApp() {

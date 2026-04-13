@@ -4,22 +4,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Arquitetura SI - SOC</title>
+  <title>Arquitetura SI - SOC | Baterias Moura</title>
   <meta name="description"
-    content="CyberPose — Visualização 3D interativa de arquitetura SOC com Suricata, SIEM Wazuh e MISP Threat Intelligence." />
+    content="Visualização 3D interativa de arquitetura SOC com Suricata, SIEM Wazuh e MISP Threat Intelligence — Baterias Moura." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <link rel="shortcut icon"
-    href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAkFBMVEX///8Xk/9z1f8Ajv911/8Aj/8AjP8Rkf9du/9kw/9Uqv+r0/9stv9jsf932f9tyv+ezf8flf+02f97u//c7f9HsP8emv/r9f+dyv+Vxf900v/z+v9EpP/u9/9wz/+Jwv/P5v/i8P9Utf82nv9ox//I4/9bq/+n0f++3f/V6f9Yuv9Lp/89of+Avf+11/9GrP93+nGZAAAXNUlEQVR4nO1da3uquhIWIaS2SqUqtopXvEv1//+7DZkkTCAggt1enjXnw1rbIuZNJnPLzKTR+Ec3pfFisRjfexB/SLuNZxDD23zdeyB/RPPApEZM1Azm9x7MX1DXBnwMo92993BuT1vbwGRv7z2gW9OeGCqR/r2HdGN6ZyxKieEaBP75fu8h3Zb2jEepcRhZo4PBINr7ew/qpjRjTEo/HatpOZ/sP8js3oO6KX0wviTnpmM5zTNbQvPj3BlydPzIZR3XWqbaIqWlbY8AHxChEkTzSzEvZEG+JQIBcRs+wLR2Ri3y3tKhEkFqpoR0hcsivMunhOhXEWlR4O+L+4zIDxlEYpqO5xAuBd9LFRrABDe6OD6b2gLtYzuTMlw4angSVpj39ABnMwAt67s4UFoLe90J+rY2c0TSYcD7R5kzUS5bslP27svKTXfamraj02prIjbiyI3ZRbaOA2oznXpf0epmwLUHO2vjuwa19fuQfW2TPqIm3Eocnhk+bl+kAuxB5WSJXkjPBWZQDVy1f6INvys0PPE6RLVPdanWikqvhJ9m58pVk3d/jNayKYUjrXit/RqFJtkUbXoDBKNaLCyktYclXNG/4i6uFSc3zSfXYaJHiBnAH4jfM28378inhOO88uzFeZC3JopgFD5Lu/arpe7/Vek5vXze9gz0uKH6AA2hre8Ef6vyFcQQul6DsJswS0gdEcKwlpFd39AULS6VOprslzKEGZLWzmXijqYZX5Z7h0JDDNx03xejVQOQlnLBA13oBddnbL+v6A5l/fTuKLsnFfnloeQ16Od4yo5cSP8/H8Y9VXEb5p3j8tzfq1iHkJZU3heHkGh1LgR/q9oLewuUdlpakrm8hA2fkUkQFbYPqB70VNsZ92tlQUIoXNWQubl2tM7kHrTfKAznfMRDtV8/UcTpJzi9th8Ae13bZ0iC/PrO61O3mU5acXm1f8H9TfUjK/9JqG2NOODW6XU1QabvkISf9mknXvk4JelYXx1+0k7wskR50Rpl7h/+pl97x7PMyxHk1TNjL7a9pnJV4Xlw5mdtelHFJiKyysfziqrSROhQ5atpdALr8WnH8jwFGbrY0fvryUoLgl4rj5Exh9Uq1ckJUzBgxyPZ1vXIdR+PLfJ+XMTNLMQHaD0Tdifm+DqDt4WmDeff7RQUz2CvBPy6VhNy4ElLGiT/4y0h8bAxmFkjQ4Q1LYL71R+PnoXJVCuKHaq2nrwUamfrsfPySJ6Ykp13rRfy6Jh1EWdN+ljHvLWpXkgDlHNGzRCeEzabTyDGN6mdjfHB6bxYrEo2Z7hH5Wl/wCTnNETH1g5OAAAAABJRU5ErkJggg=="
+    href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAkFBMVEX///8Xk/9z1f8Ajv911/8Aj/8AjP8Rkf9du/9kw/9Uqv+r0/9stv9jsf932f9tyv+ezf8flf+02f97u//c7f9HsP8emv/r9f+dyv+Vxf900v/z+v9EpP/u9/9wz/+Jwv/P5v/i8P9Utf82nv9ox//I4/9bq/+n0f++3f/V6f9Yuv9Lp/89of+Avf+11/9GrP93+nGZAAAXNUlEQVR4nO1da3uquhIWIaS2SqUqtopXvEv1//+7DZkkTCAggt1enjXnw1rbIuZNJnPLzKTR+Ec3pfFisRjfexB/SLuNZxDD23zdeyB/RPPApEZM1Azm9x7MX1DXBnwMo92993BuT1vbwGRv7z2gW9OeGCqR/r2HdGN6ZyxKieEaBP75fu8h3Zb2jEepcRhZo4PBINr7ew/qpjRjTEo/HatpOZ/sP8js3oO6KX0wviTnpmM5zTNbQvPj3BlydPziqrSROhQ5atpdALr8WnH8jwFGbrY0fvryUoLgl4rj5Exh9Uq1ckJUzBgxyPZ1vXIdR+PLfJ+XMTNLMQHaD0Tdifm+DqDt4WmDeff7RQUz2CvBPy6VhNy4ElLGiT/4y0h8bAxmFkjQ4Q1LYL71R+PnoXJVCuKHaq2nrwUamfrsfPySJ6Ykp13rRfy6Jh1EWdN+ljHvLWpXkgDlHNGzRCeEzabTyDGN6mdjfHB6bxYrEo2Z7hH5Wl/wCTnNETH1g5OAAAAABJRU5ErkJggg=="
     type="image/x-icon">
 </head>
 
 <body>
-  <div id="loading">Iniciando Arquitetura...</div>
+  <!-- ============================================================
+       LOADING SCREEN — Logo Moura + Progress Bar
+       ============================================================ -->
+  <div id="loading">
+    <div class="loading-content">
+      <img src="logo-moura.png" alt="Logo Baterias Moura" class="loading-logo" />
+      <div class="loading-title">Arquitetura SOC</div>
+      <div class="loading-bar-track">
+        <div class="loading-bar-fill" id="loading-bar-fill"></div>
+      </div>
+      <div class="loading-text" id="loading-text">Iniciando Arquitetura...</div>
+    </div>
+  </div>
 
   <canvas id="output_canvas"></canvas>
 
   <div id="ui-layer">
-    <div class="logo">Arquitetura - SOC</div>
+    <!-- Logo Moura no header -->
+    <div class="logo" id="main-logo">
+      <img src="logo-moura.png" alt="Moura" class="header-logo" />
+      <span class="header-title">Arquitetura SOC</span>
+    </div>
+
     <div class="mode-indicator">MODO: <span id="current-mode" class="status-neutral">AGUARDANDO</span></div>
     <div id="crosshair"></div>
     <div id="gps-data">KALI → SURICATA → SIEM WAZUH → MISP</div>
